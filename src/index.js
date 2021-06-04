@@ -2,8 +2,15 @@ const Koa = require('koa');
 require('dotenv').config({path: 'src/.env'})
 const app = new Koa();
 var Router = require('koa-router');
+var koaBody = require('koa-body');
 
 var router = new Router();
+
+app.use(koaBody({
+  
+  multipart: true,
+  urlencoded: true
+}));
 
 
 require('./bootstrap');
@@ -26,6 +33,18 @@ router.get('/users',async ctx => {
     
 
 })
+
+router.post('/register',async (ctx,next) => {
+  var body =   ctx.request.body;
+  console.log(body);
+  var dataQuery = await `insert into user (name,age,phone) values("${body.name}","${body.age}","${body.phone}")`
+
+
+  var response = db.query(dataQuery);
+
+  ctx.body = response;
+
+})
   
   app.listen(process.env.PORT,()=>{
     console.log('Server started at : '+ process.env.PORT);
@@ -33,4 +52,6 @@ router.get('/users',async ctx => {
 
   app
 .use(router.routes())
-.use(router.allowedMethods());
+.use(router.allowedMethods())
+
+
